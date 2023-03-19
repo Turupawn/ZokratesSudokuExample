@@ -147,7 +147,7 @@ library Pairing {
     }
 }
 
-contract Verifier is ERC721 {
+contract Verifier is ERC721 { // NFT change
 
     // NFT changes begin
     address URISetter;

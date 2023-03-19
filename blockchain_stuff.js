@@ -1,6 +1,6 @@
 const NETWORK_ID = 5
 
-const MY_CONTRACT_ADDRESS = "0x8b621cDb36A056299bB61c3188135f2eA59d76ED"
+const MY_CONTRACT_ADDRESS = "0x31379Cff7f2846fa34DA42265F1C50B827653DE9"
 const MY_CONTRACT_ABI_PATH = "./assets/Verifier.json"
 const PK_PATH = "./assets/pk.json"
 const ZOK_PATH = "./assets/source.zok"
@@ -136,39 +136,34 @@ async function getProof()
 
   zokratesProvider = await zokrates.initialize()
 
-  console.log(1)
-  
   const response = await fetch(ZOK_PATH);
   const source = await response.text();
   
-  console.log(2)
   const artifacts = zokratesProvider.compile(source);
   const { witness, output } = zokratesProvider.computeWitness(artifacts, [a21, b11, b22, c11, c22, d21, a11, a12, a22, b12, b21, c12, c21, d11, d12, d22]);
   
-  console.log(3)
   pkFile = await fetch(PK_PATH)
   pkJson = await pkFile.json()
   pk = pkJson.pk
   
-  console.log(4)
   const proof = zokratesProvider.utils.formatProof(zokratesProvider.generateProof(
     artifacts.program,
     witness,
     pk
     ));
     
-    console.log(5)
   return proof
 }
 
 const verify = async () => {
   var proof = await getProof()
-  document.getElementById("result").textContent="";
+
+  document.getElementById("proof").textContent="Proof: " + JSON.stringify(proof);
 
   var verificationResult = await my_contract.methods.verifyTx(proof[0], proof[1]).call()
   if(verificationResult)
   {
-    document.getElementById("result").textContent="Verified!";
+    alert("Success!");
   }
 }
 

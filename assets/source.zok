@@ -99,6 +99,8 @@ def main(field a21, field b11, field b22, field c11, field c22, field d21, priva
     duplicates = duplicates + countDuplicates(b11, b21, d11, d21);
     duplicates = duplicates + countDuplicates(b12, b22, d12, d22);
 
+    assert(duplicates == 0);
+
     // the solution is correct if and only if there are no duplicates
     return duplicates == 0;
 }
