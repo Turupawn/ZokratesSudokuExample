@@ -1,6 +1,6 @@
 const NETWORK_ID = 5
 
-const MY_CONTRACT_ADDRESS = "0x10be286543bDC2aEdC7f124d0e07eD7E38F36964"
+const MY_CONTRACT_ADDRESS = "0x8b621cDb36A056299bB61c3188135f2eA59d76ED"
 const MY_CONTRACT_ABI_PATH = "./assets/Verifier.json"
 const PK_PATH = "./assets/pk.json"
 const ZOK_PATH = "./assets/source.zok"
@@ -11,7 +11,6 @@ var accounts
 var web3
 
 function metamaskReloadCallback() {
-  /*
   window.ethereum.on('accountsChanged', (accounts) => {
     document.getElementById("web3_message").textContent="Se cambió el account, refrescando...";
     window.location.reload()
@@ -20,7 +19,6 @@ function metamaskReloadCallback() {
     document.getElementById("web3_message").textContent="Se el network, refrescando...";
     window.location.reload()
   })
-  */
 }
 
 const getWeb3 = async () => {
@@ -114,33 +112,76 @@ const onWalletConnectedCallback = async () => {
   // Now the account is initialized
 }
 
-const verify = async (a11, a12, a21, a22, b11, b12, b21, b22, c11, c12, c21, c22, d11, d12, d21, d22) => {
-  document.getElementById("result").textContent="";
+async function getProof()
+{
+  a11 = document.getElementById("a11").value
+  a12 = document.getElementById("a12").value
+  a21 = document.getElementById("a21").value
+  a22 = document.getElementById("a22").value
+
+  b11 = document.getElementById("b11").value
+  b12 = document.getElementById("b12").value
+  b21 = document.getElementById("b21").value
+  b22 = document.getElementById("b22").value
+
+  c11 = document.getElementById("c11").value
+  c12 = document.getElementById("c12").value
+  c21 = document.getElementById("c21").value
+  c22 = document.getElementById("c22").value
+
+  d11 = document.getElementById("d11").value
+  d12 = document.getElementById("d12").value
+  d21 = document.getElementById("d21").value
+  d22 = document.getElementById("d22").value
+
   zokratesProvider = await zokrates.initialize()
+
+  console.log(1)
   
   const response = await fetch(ZOK_PATH);
   const source = await response.text();
   
+  console.log(2)
   const artifacts = zokratesProvider.compile(source);
   const { witness, output } = zokratesProvider.computeWitness(artifacts, [a21, b11, b22, c11, c22, d21, a11, a12, a22, b12, b21, c12, c21, d11, d12, d22]);
   
-  console.log(1)
+  console.log(3)
   pkFile = await fetch(PK_PATH)
   pkJson = await pkFile.json()
   pk = pkJson.pk
   
-  console.log(2)
-  
+  console.log(4)
   const proof = zokratesProvider.utils.formatProof(zokratesProvider.generateProof(
     artifacts.program,
     witness,
     pk
     ));
-    console.log(3)
+    
+    console.log(5)
+  return proof
+}
+
+const verify = async () => {
+  var proof = await getProof()
+  document.getElementById("result").textContent="";
 
   var verificationResult = await my_contract.methods.verifyTx(proof[0], proof[1]).call()
   if(verificationResult)
   {
     document.getElementById("result").textContent="Verified!";
   }
+}
+
+const mintWithProof = async () => {
+  var proof = await getProof()
+  const result = await my_contract.methods.mintWithProof(proof[0], proof[1])
+  .send({ from: accounts[0], gas: 0, value: 0 })
+  .on('transactionHash', function(hash){
+    document.getElementById("web3_message").textContent="Executing...";
+  })
+  .on('receipt', function(receipt){
+    document.getElementById("web3_message").textContent="Success.";    })
+  .catch((revertReason) => {
+    console.log("ERROR! Transaction reverted: " + revertReason.receipt.transactionHash)
+  });
 }

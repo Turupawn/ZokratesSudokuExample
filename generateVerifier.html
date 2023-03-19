@@ -30,7 +30,7 @@
       const verifier = zokratesProvider.exportSolidityVerifier(keypair.vk);
 
       document.getElementById("verifier").textContent=verifier;
-      document.getElementById("pk").textContent='{"pk":"' + keypair.pk + '}';
+      document.getElementById("pk").textContent='{"pk":[' + keypair.pk + ']}';
     });
   }
 </script>

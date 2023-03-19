@@ -4,6 +4,10 @@
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 // The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol"; // NFTs change
+import "@openzeppelin/contracts/utils/Counters.sol"; // NFTs change
+
 pragma solidity ^0.8.0;
 library Pairing {
     struct G1Point {
@@ -143,7 +147,36 @@ library Pairing {
     }
 }
 
-contract Verifier {
+contract Verifier is ERC721 {
+
+    // NFT changes begin
+    address URISetter;
+    using Counters for Counters.Counter;
+    Counters.Counter private _tokenIds;
+    string URI;
+    constructor() ERC721("ZK Sudoku Token", "ZKST") {
+        URISetter = msg.sender;
+    }
+
+    function setURI(string memory _URI) public
+    {
+        require(msg.sender == URISetter);
+        URI = _URI;
+    }
+
+    function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
+        require(_exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
+        return URI;
+    }
+
+    function mintWithProof(Proof memory proof, uint[7] memory input) public
+    {
+        require(verifyTx(proof, input));
+        _mint(msg.sender, _tokenIds.current());
+        _tokenIds.increment();
+    }
+    // NFT changes end
+
     using Pairing for *;
     struct VerifyingKey {
         Pairing.G1Point alpha;

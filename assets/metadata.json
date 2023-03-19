@@ -1,0 +1,5 @@
+{
+    "name": "You solved the ZK Sudoku!",
+    "description": "You received this reward because you generated a zk proof of solving the Sudoku. Congratulations!",
+    "image": "https://raw.githubusercontent.com/Turupawn/ZokratesSudokuExample/master/assets/image.png"
+}

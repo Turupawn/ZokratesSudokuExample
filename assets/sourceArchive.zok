@@ -10,40 +10,14 @@
 
 // We use a naive encoding of the values as `[1, 2, 3, 4]` and rely on if-else statements to detect duplicates
 
-/*
-def countDuplicates(field e11, field e12, field e21, field e22) -> u32 {
-    u32[6] mut duplicates = [0,0,0,0,0,0];
-    duplicates[0] = e11 == e12 ? 1 : 0;
-    duplicates[1] = e11 == e21 ? 1 : 0;
-    duplicates[2] = e11 == e22 ? 1 : 0;
-    duplicates[3] = e12 == e21 ? 1 : 0;
-    duplicates[4] = e12 == e22 ? 1 : 0;
-    duplicates[5] = e21 == e22 ? 1 : 0;
-
-    u32 mut count = 0;
-    for u32 i in 0..5 {
-        count = count + duplicates[i];
-    }
-
-    return count;
-}
-*/
-
-def countDuplicates(field e11, field e12, field e21, field e22) -> u32 {
-    u32 mut countDuplicates = 0;
-    u32 mut countDuplicatesAux = e11 == e12 ? 1 : 0;
-    countDuplicates = countDuplicates + countDuplicatesAux;
-    countDuplicatesAux = e11 == e21 ? 1 : 0;
-    countDuplicates = countDuplicates + countDuplicatesAux;
-    countDuplicatesAux = e11 == e22 ? 1 : 0;
-    countDuplicates = countDuplicates + countDuplicatesAux;
-    countDuplicatesAux = e12 == e21 ? 1 : 0;
-    countDuplicates = countDuplicates + countDuplicatesAux;
-    countDuplicatesAux = e12 == e22 ? 1 : 0;
-    countDuplicates = countDuplicates + countDuplicatesAux;
-    countDuplicatesAux = e21 == e22 ? 1 : 0;
-
-    return countDuplicates;
+def countDuplicates(field e11, field e12, field e21, field e22) -> field {
+    field mut duplicates = e11 == e12 ? 1 : 0;
+    duplicates = duplicates + e11 == e21 ? 1 : 0;
+    duplicates = duplicates + e11 == e22 ? 1 : 0;
+    duplicates = duplicates + e12 == e21 ? 1 : 0;
+    duplicates = duplicates + e12 == e22 ? 1 : 0;
+    duplicates = duplicates + e21 == e22 ? 1 : 0;
+    return duplicates;
 }
 
 // returns 0 for x in (1..4)
@@ -75,7 +49,7 @@ def main(field a21, field b11, field b22, field c11, field c22, field d21, priva
     assert(validateInput(d21));
     assert(validateInput(d22));
 
-    u32 mut duplicates = 0; // globally counts duplicate entries in boxes, rows and columns
+    field mut duplicates = 0; // globally counts duplicate entries in boxes, rows and columns
 
     // check box correctness
 
